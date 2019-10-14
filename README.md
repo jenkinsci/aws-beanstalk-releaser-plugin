@@ -1,1 +1,1 @@
-# AWSBeanstalkReleader
+# AWSBeanstalkReleaser
