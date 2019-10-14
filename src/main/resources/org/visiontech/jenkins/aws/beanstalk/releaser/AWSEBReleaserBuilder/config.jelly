@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:c="/lib/credentials">
+    <f:entry title="${%CredentialId}" field="credentialId">
+        <c:select />
+    </f:entry>
+    <f:entry title="${%AWSRegion}" field="awsRegion">
+        <f:select />
+    </f:entry>
+    <f:entry title="${%ApplicationName}" field="applicationName">
+        <f:select />
+    </f:entry>
+    <f:entry title="${%EnvironmentId}" field="environmentId">
+        <f:select />
+    </f:entry>
+    <f:entry title="${%VersionLabel}" field="versionLabel">
+        <f:textbox />
+    </f:entry>
+</j:jelly>
