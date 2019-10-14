@@ -8,7 +8,7 @@
         <relativePath />
     </parent>
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>jenkins-aws-beanstalk-releaser</artifactId>
+    <artifactId>aws-beanstalk-releaser</artifactId>
     <version>1.0.0</version>
     <packaging>hpi</packaging>
     <properties>
