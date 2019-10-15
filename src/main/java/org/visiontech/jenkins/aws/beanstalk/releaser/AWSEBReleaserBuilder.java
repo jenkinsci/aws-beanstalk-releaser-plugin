@@ -18,13 +18,14 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
-import hudson.model.AbstractBuild;
+import hudson.FilePath;
 import hudson.util.FormValidation;
 import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
 import hudson.model.Item;
-import hudson.tasks.BuildStep;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.util.ListBoxModel;
@@ -38,12 +39,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import jenkins.tasks.SimpleBuildStep;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
 
-public class AWSEBReleaserBuilder extends Builder implements BuildStep {
+public class AWSEBReleaserBuilder extends Builder implements SimpleBuildStep {
 
     private final String credentialId;
     private final String awsRegion;
@@ -81,13 +84,12 @@ public class AWSEBReleaserBuilder extends Builder implements BuildStep {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-
-        EnvVars env = build.getEnvironment(listener);
+    public void perform(Run<?, ?> run, FilePath workspace, Launcher launcher, TaskListener listener) throws InterruptedException, IOException {
+        EnvVars env = run.getEnvironment(listener);
         String expand = env.expand(versionLabel);
 
         AWSElasticBeanstalkClientBuilder builder = AWSElasticBeanstalkClientBuilder.standard();
-        builder.withCredentials(CredentialsProvider.findCredentialById(credentialId, AmazonWebServicesCredentials.class, build, Collections.EMPTY_LIST));
+        builder.withCredentials(CredentialsProvider.findCredentialById(credentialId, AmazonWebServicesCredentials.class, run, Collections.EMPTY_LIST));
         builder.withClientConfiguration(Utils.getClientConfiguration());
         builder.withRegion(Regions.fromName(awsRegion));
 
@@ -100,8 +102,9 @@ public class AWSEBReleaserBuilder extends Builder implements BuildStep {
         DescribeApplicationVersionsResult describeApplicationVersions = beanstalk.describeApplicationVersions(describeApplicationVersionsRequest);
 
         if (CollectionUtils.isEmpty(describeApplicationVersions.getApplicationVersions())) {
-            listener.getLogger().println(Messages.AWSEBReleaserBuilder_DescriptorImpl_errors_versionNotFound());
-            return false;
+            listener.fatalError(Messages.AWSEBReleaserBuilder_DescriptorImpl_errors_versionNotFound());
+            run.setResult(Result.FAILURE);
+            return;
         }
 
         UpdateEnvironmentRequest updateEnvironmentRequest = new UpdateEnvironmentRequest();
@@ -113,13 +116,12 @@ public class AWSEBReleaserBuilder extends Builder implements BuildStep {
         UpdateEnvironmentResult updateEnvironment = beanstalk.updateEnvironment(updateEnvironmentRequest);
                 
         if (!Objects.equals(HttpURLConnection.HTTP_OK, updateEnvironment.getSdkHttpMetadata().getHttpStatusCode()) || !Objects.equals("Updating", updateEnvironment.getStatus()) || !Objects.equals(expand, updateEnvironment.getVersionLabel())){
-            listener.getLogger().println(Messages.AWSEBReleaserBuilder_DescriptorImpl_errors_updateError());
-            return false;
+            listener.fatalError(Messages.AWSEBReleaserBuilder_DescriptorImpl_errors_updateError());
+            run.setResult(Result.FAILURE);
         }
-
-        return true;
     }
 
+    @Symbol("awsebReleaser")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
