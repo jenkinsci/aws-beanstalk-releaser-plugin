@@ -23,6 +23,7 @@ import hudson.util.FormValidation;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
 import hudson.model.ItemGroup;
+import hudson.model.Item;
 import hudson.tasks.BuildStep;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
@@ -168,21 +169,27 @@ public class AWSEBReleaserBuilder extends Builder implements BuildStep {
             return Messages.AWSEBReleaserBuilder_DescriptorImpl_DisplayName();
         }
 
-        public ListBoxModel doFillCredentialIdItems(@AncestorInPath ItemGroup context) {
-            return AWSCredentialsHelper.doFillCredentialsIdItems(context);
+        public ListBoxModel doFillCredentialIdItems(@AncestorInPath Item owner) {
+            if (Objects.isNull(owner) || !owner.hasPermission(Item.CONFIGURE)) {
+                return new ListBoxModel(Utils.EMPTY_OPTION);
+            }
+            return AWSCredentialsHelper.doFillCredentialsIdItems(owner.getParent());
         }
 
-        public ListBoxModel doFillAwsRegionItems() {
+        public ListBoxModel doFillAwsRegionItems(@AncestorInPath Item owner) {
+            if (Objects.isNull(owner) || !owner.hasPermission(Item.CONFIGURE)) {
+                return new ListBoxModel(Utils.EMPTY_OPTION);
+            }
             return new ListBoxModel(ListUtils.union(Arrays.asList(Utils.EMPTY_OPTION), Arrays.asList(Regions.values()).stream().map(region -> new ListBoxModel.Option(region.getDescription(), region.getName())).collect(Collectors.toList())));
         }
 
-        public ListBoxModel doFillApplicationNameItems(@AncestorInPath ItemGroup context, @QueryParameter String credentialId, @QueryParameter String awsRegion) {
-            if (StringUtils.isBlank(credentialId) || StringUtils.isBlank(awsRegion)) {
+        public ListBoxModel doFillApplicationNameItems(@AncestorInPath Item owner, @QueryParameter String credentialId, @QueryParameter String awsRegion) {
+            if (Objects.isNull(owner) || !owner.hasPermission(Item.CONFIGURE) || StringUtils.isBlank(credentialId) || StringUtils.isBlank(awsRegion)) {
                 return new ListBoxModel(Utils.EMPTY_OPTION);
             }
             try {
                 AWSElasticBeanstalkClientBuilder builder = AWSElasticBeanstalkClientBuilder.standard();
-                builder.withCredentials(AWSCredentialsHelper.getCredentials(credentialId, context));
+                builder.withCredentials(AWSCredentialsHelper.getCredentials(credentialId, owner.getParent()));
                 builder.withClientConfiguration(Utils.getClientConfiguration());
                 builder.withRegion(Regions.fromName(awsRegion));
                 AWSElasticBeanstalk beanstalk = builder.build();
@@ -192,12 +199,12 @@ public class AWSEBReleaserBuilder extends Builder implements BuildStep {
             }
         }
 
-        public ListBoxModel doFillEnvironmentIdItems(@AncestorInPath ItemGroup context, @QueryParameter String credentialId, @QueryParameter String awsRegion, @QueryParameter String applicationName) {
-            if (StringUtils.isBlank(credentialId) || StringUtils.isBlank(awsRegion) || StringUtils.isBlank(applicationName)) {
+        public ListBoxModel doFillEnvironmentIdItems(@AncestorInPath Item owner, @QueryParameter String credentialId, @QueryParameter String awsRegion, @QueryParameter String applicationName) {
+            if (Objects.isNull(owner) || !owner.hasPermission(Item.CONFIGURE) || StringUtils.isBlank(credentialId) || StringUtils.isBlank(awsRegion) || StringUtils.isBlank(applicationName)) {
                 return new ListBoxModel(Utils.EMPTY_OPTION);
             }
             AWSElasticBeanstalkClientBuilder builder = AWSElasticBeanstalkClientBuilder.standard();
-            builder.withCredentials(AWSCredentialsHelper.getCredentials(credentialId, context));
+            builder.withCredentials(AWSCredentialsHelper.getCredentials(credentialId, owner.getParent()));
             builder.withClientConfiguration(Utils.getClientConfiguration());
             builder.withRegion(Regions.fromName(awsRegion));
 
