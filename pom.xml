@@ -98,8 +98,20 @@
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <scm>
         <connection>scm:git:https://github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</connection>
-        <developerConnection>scm:git:https://git@github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</developerConnection>
+        <developerConnection>scm:git:https://github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
-      <tag>aws-beanstalk-releaser-1.0.2</tag>
-  </scm>
+        <tag>aws-beanstalk-releaser-1.0.2</tag>
+    </scm>
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
