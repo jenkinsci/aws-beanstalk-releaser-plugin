@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.jenkins.plugins</groupId>
     <artifactId>aws-beanstalk-releaser</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <packaging>hpi</packaging>
     <properties>
         <!-- Baseline Jenkins version you use to build the plugin. Users must have this version or newer to run. -->
@@ -97,6 +97,6 @@
 
     <scm>
         <connection>scm:git:https://github.com/jenkinsci/aws-beanstalk-releaser-plugin</connection>
-        <tag>HEAD</tag>
+        <tag>aws-beanstalk-releaser-1.0.2</tag>
     </scm>
 </project>
