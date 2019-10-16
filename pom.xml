@@ -97,8 +97,8 @@
 
     <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</developerConnection>
+        <connection>scm:git:https://github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</connection>
+        <developerConnection>scm:git:https://git@github.com/jenkinsci/aws-beanstalk-releaser-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
       <tag>aws-beanstalk-releaser-1.0.2</tag>
   </scm>
