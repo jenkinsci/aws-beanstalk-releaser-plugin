@@ -21,7 +21,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.util.FormValidation;
 import hudson.model.AbstractProject;
-import hudson.model.ItemGroup;
 import hudson.model.Item;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -125,14 +124,14 @@ public class AWSEBReleaserBuilder extends Builder implements SimpleBuildStep {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
-        public FormValidation doCheckCredentialId(@QueryParameter String value, @AncestorInPath ItemGroup context) throws IOException, ServletException {
-
+        public FormValidation doCheckCredentialId(@QueryParameter String value, @AncestorInPath Item owner) throws IOException, ServletException {
+            owner.checkPermission(Item.CONFIGURE); 
             if (StringUtils.isBlank(value)) {
                 return FormValidation.error(Messages.AWSEBReleaserBuilder_DescriptorImpl_errors_missingValue());
             }
 
             AmazonIdentityManagementClientBuilder builder = AmazonIdentityManagementClientBuilder.standard();
-            builder.withCredentials(AWSCredentialsHelper.getCredentials(value, context));
+            builder.withCredentials(AWSCredentialsHelper.getCredentials(value, owner.getParent()));
             builder.withClientConfiguration(Utils.getClientConfiguration());
 
             AmazonIdentityManagement iam = builder.build();
