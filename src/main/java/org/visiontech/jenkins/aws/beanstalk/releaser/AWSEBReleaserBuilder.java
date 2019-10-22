@@ -44,6 +44,7 @@ import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.verb.POST;
 
 public class AWSEBReleaserBuilder extends Builder implements SimpleBuildStep {
 
@@ -124,6 +125,7 @@ public class AWSEBReleaserBuilder extends Builder implements SimpleBuildStep {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
 
+        @POST
         public FormValidation doCheckCredentialId(@QueryParameter String value, @AncestorInPath Item owner) throws IOException, ServletException {
             owner.checkPermission(Item.CONFIGURE); 
             if (StringUtils.isBlank(value)) {
